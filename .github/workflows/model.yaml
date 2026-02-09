@@ -1,0 +1,54 @@
+name: CI Workflow
+
+# on: [push, pull_request]
+on: [repository_dispatch, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: |
+          pip install click==8.3.0
+          pip install rich==14.1.0
+          pip install tld==0.13.1
+          pip install requests==2.32.5
+          pip install simplejson==3.20.2
+          pip install packaging==25.0
+          pip install appdirs==1.4.4
+          pip install iOSbackup==0.9.925
+          pip install adb-shell[usb]==0.4.4
+          pip install libusb1==3.3.1
+          pip install cryptography==46.0.3
+          pip install PyYAML>=6.0.2
+          pip install pyahocorasick==2.2.0
+          pip install betterproto==1.2.5
+          pip install pydantic==2.12.3
+          pip install pydantic-settings==2.10.1
+          pip install NSKeyedUnArchiver==1.5.2
+          pip install python-dateutil==2.9.0.post0
+          pip install tzdata==2025.2
+          pip install requests>=2.31.0
+          pip install pytest>=7.4.3
+          pip install pytest-cov>=4.1.0
+          pip install pytest-github-actions-annotate-failures>=0.2.0
+          pip install pytest-mock>=3.14.0
+          pip install stix2>=3.0.1
+          pip install ruff>=0.1.6
+          pip install mypy>=1.7.1
+          pip install betterproto[compiler]
+
+      - name: Run build script
+        run: |
+          make install
+          make test-requirements
+          set -o pipefail
+          make test-ci | tee pytest-coverage.txt

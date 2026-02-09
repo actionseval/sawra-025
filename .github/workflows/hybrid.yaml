@@ -1,0 +1,30 @@
+name: CI
+
+# on: [push, pull_request]
+on: [repository_dispatch, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+        python-version:
+          - ${{ matrix.python-version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Dependencies
+        run: pip install adb_shell==0.4.4 black==26.1.0 hyperframe==6.1.0
+      - run: |
+          make install
+      - run: |
+          make test-requirements
+          set -o pipefail
+      - run: |
+          make test-ci | tee pytest-coverage.txt
+    env:
+      MVT_ANDROID_BACKUP_PASSWORD: '123456'
